@@ -26,12 +26,45 @@ type lexeme =
   | Valeur of int
   | Fois | Plus | Moins | Div
 
-let rec colonne_parser (l : lexeme list) : lexeme list = 
+let colonne_parser (l : lexeme list) : lexeme list = 
     match l with
     | [] -> failwith "empty list"
     | Nom _::Point::Nom _::r -> r
     | Nom _::r -> r
     | _ -> failwith "no col"
+
+let rec expression_parser (l : lexeme list) : lexeme list = 
+    let arithm_parser (l : lexeme list) : lexeme list =
+        match l with
+        | Fois::e 
+        | Plus::e
+        | Moins::e
+        | Div::e -> expression_parser l
+        | _ -> l in
+
+    match l with 
+    | [] -> []
+    | Valeur _::r
+    | String _::r -> arithm_parser r
+    | ParG::r -> begin match expression_parser r with ParD::q -> q | _ -> failwith "missing paranthesis" end
+    | Nom _::r -> arithm_parser (colonne_parser l)
+    | _::_ -> failwith "wrong expression"
+
+
+let condition_parser (l : lexeme list) : lexeme list =
+    match expression_parser l with
+    | [] -> []
+    | Egal::r
+    | NonEgal::r 
+    | PlusGrand::r 
+    | PlusPetit::r 
+    | PlusGrandEgal::r 
+    | PlusPetitEgal::r -> expression_parser r
+    | IsNull::r
+    | IsNotNull::r -> r 
+    | _::ParG::_ -> failwith "not implemented"
+    | q -> q
+    
 
 let rec requete_parser (l : lexeme list) : lexeme list = l (** TODO. Q26 **)
 
