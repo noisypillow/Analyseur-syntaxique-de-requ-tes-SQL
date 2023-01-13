@@ -26,7 +26,12 @@ type lexeme =
   | Valeur of int
   | Fois | Plus | Moins | Div
 
-
+let rec colonne_parser (l : lexeme list) : lexeme list = 
+    match l with
+    | [] -> failwith "empty list"
+    | Nom _::Point::Nom _::r -> r
+    | Nom _::r -> r
+    | _ -> failwith "no col"
 
 let rec requete_parser (l : lexeme list) : lexeme list = l (** TODO. Q26 **)
 
